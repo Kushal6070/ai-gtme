@@ -1,0 +1,103 @@
+# Rocketreach Docs
+
+## Enriching a Person (Person Lookup API)
+
+Use RocketReach to enrich a person — pass any identifier you have, get back verified emails + phones.
+
+Auth
+- Header: `Api-Key: YOUR_API_KEY`  (query param `api_key` is deprecated)
+- Base URL: https://api.rocketreach.co
+
+Endpoint
+- GET /api/v2/person/lookup
+- Or the newer GET /api/v2/universal/person/lookup (adds explicit reveal_* toggles + personal/work email split)
+
+Identify the person by ONE of (best accuracy first):
+- linkedin_url=https://www.linkedin.com/in/...   (most accurate)
+- id=12345                                        (RocketReach profile ID)
+- email=person@company.com
+- name=John Doe  +  current_employer=Google       (both required together)
+- title=...                                        (optional, narrows match)
+
+Reveal toggles (universal endpoint) — opt in to what you want billed:
+- reveal_professional_email=true   -> work emails
+- reveal_personal_email=true       -> personal emails
+- reveal_phone=true                -> phone numbers
+
+Example
+  curl -X GET "https://api.rocketreach.co/api/v2/universal/person/lookup?name=Jamie%20Gullbrand&current_employer=RocketReach&reveal_professional_email=true&reveal_phone=true" \
+    -H "Api-Key: YOUR_API_KEY"
+
+Response — read the `status` field, it's async:
+- complete    -> data verified, done
+- progress    -> in progress, may include cached emails
+- searching   -> still actively searching
+- not queued  -> lookup not started yet
+If not complete, poll the lookup again (by id) or use webhook_id for async notification.
+
+Where the data is:
+- emails[]                -> all found emails
+- recommended_email       -> best email to use
+- recommended_professional_email / current_work_email
+- recommended_personal_email / current_personal_email
+- phones[]                -> phone numbers
+- current title, current_employer, linkedin_url
+
+Bulk: POST /api/v2/person/bulkLookup — 10–100 profiles per request.
+
+Notes
+- 429 = rate limited; 400/401/404 = bad request/auth/not found.
+- LinkedIn URL or profile id give better hit rates than name+employer.
+- Each revealed field consumes lookup credits — only request reveal_* flags you need.
+
+
+# Apollo.io Docs
+
+## Enriching a Person (People Enrichment / Match API)
+
+Match a single person and enrich their email/phone.
+
+Auth
+- Header: `X-Api-Key: YOUR_API_KEY`
+- Base URL: https://api.apollo.io
+
+Endpoint
+- POST /api/v1/people/match
+- Headers: `Content-Type: application/json`, `Cache-Control: no-cache`, `X-Api-Key: YOUR_API_KEY`
+
+Identify the person by any combination of:
+- email=person@company.com   (or hashed_email, MD5/SHA-256)
+- linkedin_url=https://www.linkedin.com/in/...
+- id=<apollo_person_id>
+- first_name + last_name  (or name)  +  organization_name  (or domain)
+
+Reveal flags (opt in — consume extra credits):
+- reveal_personal_emails=true   -> personal emails
+- reveal_phone_number=true      -> phones (REQUIRES webhook_url; returned async)
+- run_waterfall_email=true      -> waterfall across sources for email
+- run_waterfall_phone=true      -> waterfall across sources for phone
+- webhook_url=...               -> required when revealing phone
+
+Example
+  curl -X POST "https://api.apollo.io/api/v1/people/match" \
+    -H "X-Api-Key: YOUR_API_KEY" \
+    -H "Content-Type: application/json" \
+    -H "Cache-Control: no-cache" \
+    -d '{
+      "first_name": "Tim",
+      "last_name": "Zheng",
+      "domain": "apollo.io",
+      "reveal_personal_emails": true
+    }'
+
+Where the data is (person object):
+- email                  -> primary/work email
+- personal_emails[]      -> personal emails (needs reveal_personal_emails)
+- phone_numbers[]        -> phones (needs reveal_phone_number + webhook_url, async)
+- title, organization_name, linkedin_url
+- plus firmographic/demographic fields
+
+Notes
+- Phone reveal is async — Apollo posts results to your webhook_url, not the sync response.
+- Every enrich + each reveal flag consumes plan credits; only set the flags you need.
+- email + domain (or linkedin_url) give the best match rate.

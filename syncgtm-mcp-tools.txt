@@ -1,0 +1,266 @@
+SyncGTM MCP Tools
+=================
+Server prefix: mcp__syncgtm__
+Total tools: 24
+Generated: 2026-06-07
+
+Most tools use "waterfall enrichment" — they try multiple data providers in
+sequence (Apollo, RocketReach, LeadMagic, Datagma, Icypeas, TheirStack, AI, etc.)
+until a result is found. Credit cost is listed per tool.
+
+Format per tool:
+    <name> — <cost>
+        <description>
+        Required: ...
+        Optional: ...
+
+
+ACCOUNT
+-------
+check_credits — free
+    Check your remaining credit balance. Call before using expensive tools.
+    Required: (none)
+    Optional: (none)
+
+
+PERSON ENRICHMENT
+-----------------
+enrich_person — 2 credits
+    Enrich a person by name, email, LinkedIn URL, or organization. Returns
+    contact details, job title, company info, and more (Apollo).
+    Required: at least one of — first_name, last_name, email, linkedin_url, organization_name
+    Optional: (the remaining identifiers above)
+
+find_work_email — 1 credit
+    Find the work email address of a person (Datagma, LeadMagic, RocketReach,
+    Apify, Forager, Findymail, LinkedIn).
+    Required: linkedin_url
+    Optional: first_name, last_name, organization_name
+
+find_personal_email — 3 credits
+    Find the personal email address of a person (Datagma, RocketReach,
+    LeadMagic, Forager, Findymail, LinkedIn).
+    Required: linkedin_url
+    Optional: first_name, last_name, organization_name
+
+find_work_phone — 15 credits
+    Find the work phone number of a person (LeadMagic, RocketReach, Datagma,
+    Forager, Findymail, LinkedIn).
+    Required: linkedin_url
+    Optional: first_name, last_name, organization_name
+
+find_mobile_number — 15 credits
+    Find the mobile phone number of a person (LeadMagic, Datagma, RocketReach,
+    Forager, Findymail, LinkedIn).
+    Required: linkedin_url
+    Optional: first_name, last_name, organization_name
+
+verify_email — 0.3 credits
+    Verify whether an email is valid and deliverable.
+    Required: email
+    Optional: (none)
+
+validate_whatsapp — 0.5 credits
+    Validate whether a phone number is registered on WhatsApp.
+    Required: mobile
+    Optional: (none)
+
+
+REVERSE LOOKUP — EMAIL -> LINKEDIN
+----------------------------------
+find_linkedin_from_work_email — 2 credits
+    Find a person's LinkedIn URL from their work email (Apollo, RocketReach,
+    Datagma, LeadMagic, Icypeas).
+    Required: email
+    Optional: (none)
+
+find_linkedin_from_personal_email — 2 credits
+    Find a person's LinkedIn URL from their personal email (Apollo, RocketReach,
+    Datagma, LeadMagic, Icypeas).
+    Required: email
+    Optional: work_email
+
+linkedin_profile_enrich — 1 credits
+    Enrich a LinkedIn profile. Returns work experience, education, skills.
+    Required: profile_url
+    Optional: (none)
+
+linkedin_profile_posts — 1 credit
+    Get the 10 most recent posts and engagements from a LinkedIn profile
+    (content, engagement, timestamps).
+    Required: profile_url
+    Optional: (none)
+
+
+
+COMPANY ENRICHMENT
+------------------
+enrich_organization — 2 credits
+    Enrich a company by domain. Returns industry, size, funding, technologies.
+    Required: domain
+    Optional: (none)
+
+Company Techstack (find_company_techstack) — 1 credit
+    Find the technology stack used by a company.
+    Required: domain
+    Optional: (none)
+
+Company Website Traffic (find_company_website_traffic) — 1 credit
+    Find website traffic data for a company.
+    Required: domain
+    Optional: (none)
+
+Find People Within Company — 0.5 credits/result
+    Search for people within a company using multiple providers. Results from
+    all providers are merged and deduplicated.
+    Required: domain
+    Optional: title, company_name, first_name, last_name, country,
+              max_results (default 5)
+
+Company Job Listings — 0.5 credits/result
+    Find job openings at a company using filters like title, location, and
+    department. Spot growth signals and personalize outreach based on active
+    hiring needs.
+    Required: company domain or name
+    Optional: company_linkedin_url, workplace_type, max_results (default 5),
+              job_titles_include, job_titles_exclude, posted_after,
+              posted_before, keywords, remote
+
+
+LINKEDIN COMPANY / PAGE
+-----------------------
+Enrich LinkedIn page — 0.5 credits
+    Enrich a LinkedIn company page. Returns description, specialties, employee
+    count, and more.
+    Required: identifier (LinkedIn id, URL, or name)
+    Optional: (none)
+
+Premium LinkedIn Page Insights — 2 credits
+    Get deep insights for a LinkedIn company — growth trends, hiring patterns,
+    employee distribution.
+    Required: identifier (LinkedIn id, URL, or name)
+    Optional: (none)
+
+LinkedIn Page Posts — 1 credit
+    Get recent posts from a LinkedIn company page (content, engagement,
+    timestamps).
+    Required: company_url (LinkedIn URL or company name)
+    Optional: max_posts (default 10, max 100)
+
+Job Openings Growth Rate — 2 credits
+    Track the growth rate of a company's open job postings over time.
+    Required: LinkedIn page URL
+    Optional: (none)
+
+Head Count Growth Rate — 2 credits
+    Track the growth rate of a company's employee headcount over time.
+    Required: LinkedIn page URL
+    Optional: (none)
+
+
+
+##Coming soon:
+
+LINKEDIN JOB SCRAPER
+--------------------
+SimilarWeb Insights (similarweb_insights) — 1 credits
+    Get website traffic stats and audience insights from SimilarWeb. Analyze
+    domain metrics like total visits, engagement rates, top traffic sources,
+    and competitor performance. Perfect for market research, lead scoring, and
+    identifying high-traffic prospects.
+    Required: domains (array of domains/websites, e.g. ["stripe.com"])
+    Optional: manually_set_trigger_column (bool), only_run_if (condition string, e.g. "Domain !== \"\"")
+
+LinkedIn Job Scraper (keyword_based_search) — 0.3 credits/job found
+    Scrape LinkedIn job listings by keyword and location.
+    Required: keywords (array, e.g. ["Software Engineer"])
+    Optional: location, distance (search radius), published_at (e.g. "Last 24 hours"),
+              job_type, experience_level, work_type, minimum_salary,
+              max_results, save_only_unique_items (bool), enrich_company_data (bool)
+
+
+Lead sourcing
+-----------------------
+LinkedIn Jobs — 0.3 credits/result
+    Search LinkedIn job listings by keyword, location, and filters.
+    Required: keywords (array, e.g. ["RevOps"])
+    Optional: location, job_type, experience_level, work_type, max_results
+
+Get Job Listings — 0.3 credits/result
+    Retrieve job listings from a specific company's LinkedIn page.
+    Required: company_linkedin_url or company domain
+    Optional: title, department, location, max_results
+
+LinkedIn Commenters — 0.3 credits/commenter
+    Get people who commented on a LinkedIn post. Useful for building warm
+    lead lists from engaged audiences.
+    Required: post_url
+    Optional: max_results
+
+LinkedIn Engagers — 0.3 credits/enager
+    Get people who reacted to a LinkedIn post (likes, celebrates, etc.).
+    Required: post_url
+    Optional: max_results, reaction_type
+
+
+COMPANY INTELLIGENCE
+--------------------
+Find Companies Using X Techstack (BuiltWith) — 1 credit
+    Find companies using a specific technology stack via BuiltWith.
+    Required: technology (e.g. "HubSpot", "Stripe")
+    Optional: country, employee_count_min, employee_count_max, max_results
+
+Headcount (by department) — 2 credits
+    Get total headcount or headcount filtered by department for a company.
+    Required: linkedin_page_url
+    Optional: department (e.g. "Engineering", "Sales")
+
+SemRush Insights — 1 credit
+    Get traffic, top keywords, and backlink data for a domain via SemRush.
+    Required: domain
+    Optional: (none)
+
+Google Maps Listings + Reviews — 0.3 credits/ business
+    Get business listings and reviews from Google Maps.
+    Required: query or place_id
+    Optional: location, max_results, include_reviews (bool)
+
+
+ENRICHMENT
+-------------
+Revenue — 1 credit
+    AI-estimated annual revenue for a company based on available signals.
+    Required: domain or company_name
+    Optional: (none)
+
+Funding — 1 credit
+    AI-estimated or scraped total funding and last round data.
+    Required: domain or company_name
+    Optional: (none)
+
+Education — 1 credit
+    Get a person's educational background from their LinkedIn profile.
+    Required: linkedin_url
+    Optional: (none)
+
+Previous Titles — 1 credit
+    Get a person's previous job titles and companies from LinkedIn history.
+    Required: linkedin_url
+    Optional: (none)
+
+
+
+Meta Ads from Page ID — 1 credit
+    Get active ads running from a Facebook/Meta page.
+    Required: page_id
+    Optional: ad_type, max_results
+
+Instagram Posts — 1 credit
+    Get recent posts from an Instagram profile.
+    Required: username or profile_url
+    Optional: max_posts (default 10)
+
+TikTok Posts — 0.3 credits/post
+    Get recent posts from a TikTok profile.
+    Required: username or profile_url
+    Optional: max_posts (default 10)

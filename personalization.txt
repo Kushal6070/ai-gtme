@@ -1,0 +1,38 @@
+
+General template:
+
+{{first_name}}, {signals based 02 personalization}
+
+{problem ICP might be facing} 
+
+{Our solution and how we help them}
+
+{CTA}
+
+
+LinkedIn DMs:
+
+# Head of sales, revenue, GTM
+{first name}, congrats on your new role. (or congrats on the recent funding, etc based on signals column)
+
+We offer an AI tool that helps reps research accounts, enrich data, and personalize outbound 5x faster.
+
+Worth a quick chat?
+
+
+# Head of sales
+{first name}, congrats on your new role. (or congrats on the recent funding, etc based on signals column)
+
+You're probably looking at implementing AI to help your reps.
+
+We offer an AI tool that helps reps research accounts, enrich data, and personalize outbound 5x faster.
+
+Worth a quick chat?
+
+
+# Roll back to this general LinkedIn template
+{first name}, found your profile while searching for {title} (e.g. sales leaders for seniors, SDR, BDR, AE)
+
+Building tool that helps sales teams scale personalized outbound with AI.
+
+Would love to connect.
